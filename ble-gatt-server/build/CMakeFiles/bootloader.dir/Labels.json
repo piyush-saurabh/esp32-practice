@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/home/roguesecurity/Documents/myfiles/iot/esp32/esp-idf/practice/ble-prov/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}
