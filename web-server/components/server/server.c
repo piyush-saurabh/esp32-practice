@@ -23,7 +23,7 @@ static esp_err_t on_url_hit(httpd_req_t *req)
     ESP_LOGI(TAG, "url %s was hit", req->uri);
 
     // Access the spiffs to serve the page
-    // Create the spiffs config
+    // Create the spiffs config (check the partition.csv to find the spiffs name)
     esp_vfs_spiffs_conf_t config = {
         .base_path = "/web",
         .partition_label = NULL,
@@ -76,6 +76,11 @@ static esp_err_t on_get_temperature(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "url %s was hit", req->uri);
     char *message = "{\"temperature\": \"25\"}";
+
+    // Setup the MIME type
+    httpd_resp_set_type(req, "application/json");
+
+    // Send the response
     httpd_resp_send(req, message, strlen(message));
     return ESP_OK;
 }
