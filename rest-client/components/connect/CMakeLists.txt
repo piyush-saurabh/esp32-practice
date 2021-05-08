@@ -1,5 +1,5 @@
 idf_component_register(
     SRCS "connect.c"
     INCLUDE_DIRS "include"
-    REQUIRES fetch json nvs_flash
+    REQUIRES nvs_flash
     )

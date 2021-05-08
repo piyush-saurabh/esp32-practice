@@ -2,23 +2,16 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_wifi.h>  // for connecting to the internet
-#include <nvs_flash.h> // used by wifi internally to store information
-#include <esp_http_client.h>
+#include <esp_wifi.h>  // for connecting/disconnecting from wifi
 #include <esp_log.h>
-#include <esp_event_loop.h>
 
 #include <cJSON.h> // JSON parsing library
-
-//#include <esp_event.h> // wifi uses event loop to act on the events associated with wifi (depricated)
-#include <esp_netif.h>
 
 // Rest client
 #include "fetch.h"
 
 // Connect to wifi
 #include "connect.h"
-
 
 // Binary semaphore for the task when wifi is connected
 xSemaphoreHandle onConnectionHandler;
@@ -27,6 +20,7 @@ xSemaphoreHandle onConnectionHandler;
 char *TAG = "MAIN";
 
 // Parse the JSON response
+// This logic will be specific to the URL
 void parseResponse(char *incomingBuffer, char * output)
 {
     cJSON *payload = cJSON_Parse(incomingBuffer);
@@ -38,7 +32,7 @@ void parseResponse(char *incomingBuffer, char * output)
     cJSON_ArrayForEach(quotesElement, quotes)
     {
         cJSON *quote = cJSON_GetObjectItem(quotesElement, "quote");
-        ESP_LOGI(TAG,"%s",quote->valuestring);
+        //ESP_LOGI(TAG,"%s",quote->valuestring);
 
         // do something with quote
         strcpy(output, quote->valuestring);

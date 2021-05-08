@@ -6,8 +6,6 @@
 #include <esp_wifi.h>  // for connecting to the internet
 #include <esp_log.h>
 #include <nvs_flash.h> // used by wifi internally to store information
-//#include <cJSON.h>
-#include <fetch.h>
 
 #define TAG "CONNECT"
 

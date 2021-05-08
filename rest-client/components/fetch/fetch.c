@@ -3,19 +3,14 @@
 #include <string.h>
 #include <esp_http_client.h>
 #include <esp_log.h>
-//#include <cJSON.h> // JSON parsing library
 
 #include "fetch.h"
-#include "connect.h"
 
 #define TAG "HTTPCLIENT"
 
 // buffer for storing response data (dynamic memory allocation)
 char *buffer = NULL;
 int buffer_index = 0;
-
-// parse the JSON
-//void parseResponse(char *incomingBuffer);
 
 // Event handler for processing the response made by the http client
 esp_err_t clientEventHandler(esp_http_client_event_t *evt)
@@ -55,7 +50,7 @@ esp_err_t clientEventHandler(esp_http_client_event_t *evt)
         // add 1 more byte to the buffer to make it string
         buffer = (char *)realloc(buffer, buffer_index+1);
         memcpy(&buffer[buffer_index+1], "\0", 1);
-        ESP_LOGI(TAG, "%s", buffer);
+        //ESP_LOGI(TAG, "%s", buffer);
 
         // Parse the JSON
         fetchParams->parseResponse(buffer, fetchParams->message);
