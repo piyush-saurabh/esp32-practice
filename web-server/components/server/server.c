@@ -4,6 +4,7 @@
 #include <esp_http_server.h>
 #include <cJSON.h>
 #include <driver/gpio.h>
+#include <esp_spiffs.h> //for accessing spiffs (html pages)
 
 #define TAG "SERVER"
 
@@ -20,8 +21,53 @@ void InitializeLed(){
 static esp_err_t on_url_hit(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "url %s was hit", req->uri);
-    char *message = "hello world!";
-    httpd_resp_send(req, message, strlen(message));
+
+    // Access the spiffs to serve the page
+    // Create the spiffs config
+    esp_vfs_spiffs_conf_t config = {
+        .base_path = "/web",
+        .partition_label = NULL,
+        .max_files = 5,
+        .format_if_mount_failed = false};
+
+    // Initialize SPIFFS to use the configuration
+    esp_vfs_spiffs_register(&config);
+
+
+    char path[600];
+    if (strcmp(req->uri, "/") == 0)
+    {
+        strcpy(path, "/web/index.html");
+    }
+    else
+    {
+        sprintf(path, "/web%s", req->uri);
+    }
+
+    // Open the file and read it
+    FILE *file = fopen(path, "r");
+    if (file == NULL)
+    {
+        // If file doesn't exist, return 404 Not Found status
+        httpd_resp_send_404(req);
+    }
+    else
+    {
+        char lineRead[256];
+        while (fgets(lineRead, sizeof(lineRead), file))
+        {
+            httpd_resp_sendstr_chunk(req,lineRead);
+        }
+
+        // Terminate the connection
+        httpd_resp_sendstr_chunk(req, NULL);
+    }
+
+    // Deinitialize spiffs
+    esp_vfs_spiffs_unregister(NULL);
+
+    // char *message = "hello world!";
+    // httpd_resp_send(req, message, strlen(message));
     return ESP_OK;
 }
 
