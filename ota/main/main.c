@@ -11,6 +11,7 @@
 #include <esp_log.h>
 #include <driver/gpio.h>              // use trigger to start the update
 #include "protocol_examples_common.h" // quickly connect to internet using this example
+#include <esp_ota_ops.h>
 
 #define TAG "OTA"
 
@@ -18,7 +19,7 @@
 xSemaphoreHandle ota_semaphore;
 
 // Software version
-const int software_version = 1;
+//const int software_version = 1;
 
 // Flash memory location for the stored server certificate (cert pinning)
 // naming convention _binary_file_extension_start
@@ -56,7 +57,7 @@ void run_ota(void *params)
         if (esp_https_ota(&clientConfig) == ESP_OK)
         {
             // The new binary is written to the OTA partition
-            ESP_LOGI(TAG, "OTA flash succsessfull for version %d.", software_version);
+            //ESP_LOGI(TAG, "OTA flash succsessfull for version %d.", software_version);
             printf("restarting in 5 seconds\n");
             vTaskDelay(pdMS_TO_TICKS(5000));
 
@@ -77,11 +78,21 @@ void on_button_pushed(void *params)
 
 void app_main(void)
 {
-    printf("You are running old version. Please update\n");
+    //printf("You are running old version. Please update\n");
     ///printf("Congrats!! You are latest version of firmware\n");
 
     // Print the current software version on starting the application
-    ESP_LOGI("SOFTWARE VERSION", "we are running %d", software_version);
+    //ESP_LOGI("SOFTWARE VERSION", "we are running %d", software_version);
+
+    // Get the software version from ESP
+    // Get the currently running partition
+    const esp_partition_t *running_partition = esp_ota_get_running_partition();
+
+    // Get the description of currently running partition
+    esp_app_desc_t running_partition_description;
+    esp_ota_get_partition_description(running_partition, &running_partition_description);
+
+    printf("current firmware version is: %s\n", running_partition_description.version);
 
     // Use button on ESP32 to trigger the interrupt
     // GPIO 0 is BOOT button on ESP32 DOIT DevKit v1 (30 pins)
