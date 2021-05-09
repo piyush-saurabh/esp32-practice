@@ -18,11 +18,11 @@
 xSemaphoreHandle ota_semaphore;
 
 // Software version
-const int software_version = 1;
+const int software_version = 2;
 
 // Flash memory location for the stored server certificate (cert pinning)
 // naming convention _binary_file_extension_start
-extern const uint8_t server_cert_pem_start[] asm("_binary_google_cer_start");
+extern const uint8_t server_cert_pem_start[] asm("_binary_github_cer_start");
 
 esp_err_t  client_event_handler(esp_http_client_event_t *evt)
 {
@@ -47,7 +47,7 @@ void run_ota(void *params)
 
         // Use HTTP Client to fetch the OTA
         esp_http_client_config_t clientConfig = {
-            .url = "https://doc-14-ao-docs.googleusercontent.com/docs/securesc/428hqvh5obll01kf1kqn5mhlvt3giieq/tu63hnu0r21c1vb7jqor4co5a91murpf/1620571050000/09815865139167860328/08879248400194035845Z/1z-AE6coVB2NC0Nk-LOUu_0nPbf4RB8Sr?e=download", // our ota location
+            .url = "https://github.com/piyush-saurabh/esp32-practice/raw/main/ota/release/v1/ota.bin", // our ota location
             .event_handler = client_event_handler,
             .cert_pem = (char *)server_cert_pem_start // verify the server certificate
         };
@@ -77,7 +77,8 @@ void on_button_pushed(void *params)
 
 void app_main(void)
 {
-    printf("You are running old version. Please update\n");
+    //printf("You are running old version. Please update\n");
+    printf("Congrats!! You are latest version of firmware\n");
 
     // Print the current software version on starting the application
     ESP_LOGI("SOFTWARE VERSION", "we are running %d", software_version);
