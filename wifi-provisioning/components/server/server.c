@@ -5,9 +5,12 @@
 #include <cJSON.h>
 #include <driver/gpio.h>
 #include <esp_spiffs.h> //for accessing spiffs (html pages)
+#include <esp_wifi.h> 
 
 #include "nvs_flash.h"
 #include "nvs.h"
+
+#include "connect.h"
 
 #define TAG "SERVER"
 
@@ -21,11 +24,22 @@ void InitializeLed(){
 }
 
 // Reset the wifi
+// FreeRTOS task
 void resetWifi(void *params)
 {
+    // Pause for 1s and then stop
     vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+    // After getting the wifi creds stop the wifi
     esp_wifi_stop();
+   
+   
+    // Give back the semaphore
+    // This will make the WiFi init code to run once again
+    // This time the NVS is configured, so wifi will start in ST mode
     xSemaphoreGive(initSemaphore);
+
+    // Delete itself
     vTaskDelete(NULL);
 }
 
@@ -171,6 +185,7 @@ static esp_err_t on_setwifi_set(httpd_req_t *req)
     httpd_resp_set_hdr(req, "Location", "/wifi-set.html");
     httpd_resp_send(req, NULL, 0);
 
+    // Stop the wifi after getting the WiFi credentials
     xTaskCreate(resetWifi, "reset wifi", 1024 * 2, NULL, 15, NULL);
     return ESP_OK;
 }

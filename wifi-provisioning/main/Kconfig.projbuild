@@ -1,11 +1,11 @@
-menu "WIFI CONNECT"
+menu "WiFi Provisioning"
 
 config WIFI_SSID
     string "SSID"
-    default "my ssid"
+    default "Chip2Cloud Smart Home"
 
 config WIFI_PASSWORD
     string "PASSWORD"
-    default "my password"  
+    default "chip2cloudp@ss"  
 
 endmenu

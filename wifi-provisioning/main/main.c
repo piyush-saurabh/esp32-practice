@@ -12,30 +12,30 @@
 #include "server.h"
 
 // Binary semaphore for the task when wifi is connected
-xSemaphoreHandle onConnectionHandler;
+xSemaphoreHandle connectionSemaphore;
+
+// Binary semaphore for wifi initialization
+// Add this to connect.h
+xSemaphoreHandle initSemaphore;
 
 // Tag for logging
 char *TAG = "MAIN";
 
 
-// Task handler: Make HTTP request
+// Task handler
 void onConnected(void *param)
 {
     while (true)
     {
         // If wifi is connected. Try getting the semaphore for 10sec
         // similar to wait. It will wait till xSemaphoreGive is invoked from some other task
-        if (xSemaphoreTake(onConnectionHandler, 10 * 1000 / portTICK_PERIOD_MS))
+        if (xSemaphoreTake(connectionSemaphore, portMAX_DELAY))
         {
             // do something useful
             // Start the HTTP server
             RegisterEndPoints();
-            
 
-            // Don't disconnect from wifi because we want to keep listening
-            // esp_wifi_disconnect();
-
-            xSemaphoreTake(onConnectionHandler, portMAX_DELAY);
+            //xSemaphoreTake(connectionSemaphore, portMAX_DELAY);
         }
         else
         {
@@ -55,10 +55,16 @@ void onConnected(void *param)
 void app_main(void)
 {
     // create binary semaphore for handling task when wifi is connected
-    onConnectionHandler = xSemaphoreCreateBinary();
+    connectionSemaphore = xSemaphoreCreateBinary();
 
-    // Initialize the wifi
-    wifiInit();
+    // Initialize the wifi. 
+    // Without calling the function directly, we can use FreeRTOS task so that we can control it using semaphore
+    // wifiInit();
+
+    // Task for initializing wifi
+    initSemaphore = xSemaphoreCreateBinary();
+    xTaskCreate(&wifiInit, "init comms", 1024 * 3, NULL, 10, NULL);
+    xSemaphoreGive(initSemaphore);
 
     // create a task for making HTTP request
     xTaskCreate(&onConnected, "On Connected", 1024 * 5, NULL, 5, NULL);
