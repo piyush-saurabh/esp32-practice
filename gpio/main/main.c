@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "driver/dac.h" // for digital to analog conversion
 
 // Define the pin number
 // Onboard LED is connected to this pin
@@ -13,6 +14,7 @@
 
 // External LED Pin (OUTPUT)
 #define LED_PIN 17
+
 
 // Queue
 xQueueHandle interputQueue;
@@ -144,6 +146,7 @@ void gpio_input_demo()
     */
 }
 
+// GPIO input with configuration
 void gpio_config_demo()
 {
     gpio_config_t config;
@@ -168,6 +171,18 @@ void gpio_config_demo()
 
 }
 
+// Digital to analog converter with 
+void dac_demo()
+{
+    // Use channel 2 DAC (GPIO 26)
+    dac_output_enable(DAC_CHANNEL_2);
+
+    // Set the value of the pin
+    // Since DAC is 8 bit, its val is 0-255
+    dac_output_voltage(DAC_CHANNEL_2,150);
+
+}
+
 void app_main(void)
 {
 
@@ -184,7 +199,12 @@ void app_main(void)
     // gpio_input_demo();
 
     // multiple GPIO with config
-    gpio_config_demo();
+    //gpio_config_demo();
+
+    // Digital to analog converter
+    // Usecase: control the brightness of LED
+    dac_demo();
+
 }
 
 /*
