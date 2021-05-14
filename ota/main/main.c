@@ -171,7 +171,7 @@ void on_button_pushed(void *params)
 void app_main(void)
 {
     //printf("You are running old version. Please update\n");
-    ///printf("Congrats!! You are latest version of firmware\n");
+    printf("Congrats!! This is the latest version of the firmware\n");
 
     // Print the current software version on starting the application
     //ESP_LOGI("SOFTWARE VERSION", "we are running %d", software_version);
