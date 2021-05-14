@@ -144,9 +144,34 @@ void gpio_input_demo()
     */
 }
 
+void gpio_config_demo()
+{
+    gpio_config_t config;
+
+    config.intr_type = GPIO_INTR_POSEDGE;
+    config.mode = GPIO_MODE_INPUT;
+    //config.pull_down_en = true;
+    //config.pull_up_en = false;
+
+    // assign gpio number to 64bit memory (unsigned long long)
+    // If we need multiple pins, we can OR them
+    config.pin_bit_mask = ((1ULL<<PUSH_BUTTON_PIN) | (1ULL<<LED_PIN));
+
+    // Set the gpio config
+    gpio_config(&config);
+
+    interputQueue = xQueueCreate(10, sizeof(int));
+    xTaskCreate(buttonPushedTask, "buttonPushedTask", 2048, NULL, 1, NULL);
+
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(PUSH_BUTTON_PIN, gpio_isr_handler, (void *)PUSH_BUTTON_PIN);
+
+}
+
 void app_main(void)
 {
 
+    // This is very simple onboard led blink
     //gpio_output_demo();
 
     // Create a queue for handling interrupt tasks
@@ -155,7 +180,11 @@ void app_main(void)
     // Create a task that can run in background
     xTaskCreate(buttonPushedTask, "buttonPushedTask", 2048, NULL, 1, NULL);
 
-    gpio_input_demo();
+    // This is the push button with interrupt (ISR)
+    // gpio_input_demo();
+
+    // multiple GPIO with config
+    gpio_config_demo();
 }
 
 /*
