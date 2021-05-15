@@ -4,6 +4,8 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/dac.h" // for digital to analog conversion
+#include "driver/adc.h" // for analog to digital conversion
+#include "driver/ledc.h" // for pwm
 
 // Define the pin number
 // Onboard LED is connected to this pin
@@ -14,6 +16,9 @@
 
 // External LED Pin (OUTPUT)
 #define LED_PIN 17
+
+// Dummy 3.3 V source
+#define DUMMY_VCC_PIN 23
 
 
 // Queue
@@ -183,6 +188,99 @@ void dac_demo()
 
 }
 
+ // HACK
+ // Use GPIO as 3.3V source (since there is only 1 3.3V pin on ESP32 board)
+void set_dummy_voltage_source()
+{
+    gpio_pad_select_gpio(DUMMY_VCC_PIN);
+    gpio_set_direction(DUMMY_VCC_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_level(DUMMY_VCC_PIN, 1);
+}
+
+// Analog to digital converter
+void adc_demo()
+{
+
+    // Configure the scale
+    // 2^12 = 4095 => 1.1 V
+    adc1_config_width(ADC_WIDTH_BIT_12);
+
+    // Configure attenuation
+    // Specify the ADC pin (GPIO39)
+    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_0);
+    while (true)
+    {
+        // Read the analog value
+        // Value will be in range 0-4095 (since 12 Bit is used)
+        int val = adc1_get_raw(ADC1_CHANNEL_3);
+
+        /*
+            Readings
+            Day (indoor): ~3500
+            Day (cover with hand): ~1500
+            Flash light on LDR: 4095 (max 12 bit value)
+        */
+        printf("value is %d\n", val);
+
+        // wait for 1sec
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
+void pwd_demo()
+{
+    // Create timer structure
+    ledc_timer_config_t timer = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .duty_resolution = LEDC_TIMER_10_BIT, // 0-1023
+        .timer_num = LEDC_TIMER_0, // should be same in channel
+        .freq_hz = 5000,
+        .clk_cfg = LEDC_AUTO_CLK};
+
+    // Configure the timer
+    ledc_timer_config(&timer);
+
+    // Create the channel
+    ledc_channel_config_t channel = {
+        .gpio_num = LED_PIN, //GPIO 17
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0, // should match the one in timer
+        .duty = 0, // Range depends on duty_resolution (here 0-1023)
+        .hpoint = 0};
+
+    // Configure the channel
+    ledc_channel_config(&channel);
+
+    // need for ledc_set_duty_and_update()
+    ledc_fade_func_install(0);
+
+    // Change the duty cycle
+    // Range is 0-1023 since the duty_resolution is 10 bits
+    for (int i = 0; i < 1024; i++)
+    {
+        // ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i);
+        // ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+
+        // Set and update the duty cycle
+        ledc_set_duty_and_update(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i, 0);
+
+        // S
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+
+    // Alternate to to above logic
+    while (true)
+    {
+        // Specify the target duty cycle value (0) and time required to reach to that value (1000 ms)
+        // Turn off the LED slowly
+        ledc_set_fade_time_and_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0, 1000, LEDC_FADE_WAIT_DONE);
+
+        // Turn on the LED slowly
+        ledc_set_fade_time_and_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 1024, 1000, LEDC_FADE_WAIT_DONE);
+    }
+}
+
 void app_main(void)
 {
 
@@ -203,7 +301,16 @@ void app_main(void)
 
     // Digital to analog converter
     // Usecase: control the brightness of LED
-    dac_demo();
+    //dac_demo();
+
+    // Dummy voltage source
+    set_dummy_voltage_source();
+
+    // Analog to digital converter
+    //adc_demo();
+
+    // Pulse Width Modulation demo
+    pwd_demo();
 
 }
 
