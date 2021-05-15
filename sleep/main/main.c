@@ -10,8 +10,8 @@
 #include <esp32/rom/uart.h> // Used to include uart_tx_wait_idle()
 #include <driver/rtc_io.h> // This allows to use GPIO pins while sleeping  
 
-// Use Boot button (0) or any RTC GPIO to wake up from light sleep (keep the button in pullup state)
-#define INPUT_PIN 0
+// Use Boot button (0) or any RTC GPIO (e.g. 26) to wake up from light sleep (keep the GPIO in pullup state)
+#define INPUT_PIN 26
 
 // Dummy 3.3 V source
 #define DUMMY_VCC_PIN 23
@@ -131,9 +131,24 @@ void deep_sleep_timer()
     // Code here will not be executed (unlike light sleep)
 }
 
+// basic deep sleep using button press
 void deep_sleep_ext0()
 {
+    // Use this GPIO us general purpose when the chip is not in sleep
+    rtc_gpio_deinit(INPUT_PIN);
+    // Code here can use this GPIO as normal gpio 
 
+    // Uncommend this if using internal pullup
+    //rtc_gpio_pullup_en(INPUT_PIN);
+    //rtc_gpio_pulldown_dis(INPUT_PIN);
+
+    // Wake up on button press. This will commect GPIO to ground (0)
+    esp_sleep_enable_ext0_wakeup(INPUT_PIN, 0);
+
+    printf("Going to deep sleep. Woken up %d\n", timesWokenUp++);
+
+    // Start the deep sleep
+    esp_deep_sleep_start();
 }
 
 void deep_sleep_ext1()
@@ -152,5 +167,8 @@ void app_main(void)
     // demo for light sleep with gpio and timer
     // light_sleep_timer_gpio();
 
-    deep_sleep_timer();
+    // deep_sleep_timer();
+
+    // On button press (default high), go to sleep
+    deep_sleep_ext0();
 }
