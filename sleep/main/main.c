@@ -114,6 +114,7 @@ void light_sleep_timer_gpio()
 
 // record information during deep sleep
 // This compiler directive instructs to write data to the special part of the memory so that the value is persisted even after reset from deep sleep
+// For this to work, slow memory should be ON (look hibernation function)
 RTC_DATA_ATTR int timesWokenUp = 0; 
 
 // very simple deep sleep with timer
@@ -151,9 +152,46 @@ void deep_sleep_ext0()
     esp_deep_sleep_start();
 }
 
+// Provides more capabilities
+// We can have multiple buttons in the circuit and we can wake up if all the gpio are low (ESP_EXT1_WAKEUP_ALL_LOW) or any of the gpio is high (ESP_EXT1_WAKEUP_ANY_HIGH)
 void deep_sleep_ext1()
 {
+    
+    rtc_gpio_deinit(GPIO_NUM_25);
+    rtc_gpio_deinit(GPIO_NUM_26);
+    /// general gpio functions using the pin.
 
+    // Enable RTC peripherals
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+
+    rtc_gpio_pullup_dis(GPIO_NUM_25);
+    rtc_gpio_pulldown_en(GPIO_NUM_25);
+    rtc_gpio_pullup_dis(GPIO_NUM_26);
+    rtc_gpio_pulldown_en(GPIO_NUM_26);
+
+    // configure multiple gpio at once
+    uint64_t mask = (1ULL << GPIO_NUM_25) | (1ULL << GPIO_NUM_26);
+
+    esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
+    printf("going to sleep. woken up %d\n", timesWokenUp++);
+
+    esp_deep_sleep_start();
+}
+
+// Further turning off multiple components to minimize current draw
+// Hibernate for 5 sec
+void hibernation()
+{
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
+
+    // This will put the memory to sleep and we cannot retain the value of timesWokenUp
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF); 
+
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+    esp_sleep_enable_timer_wakeup(5 * 1000000);
+    printf("going to sleep. woken up %d\n", timesWokenUp++);
+
+    esp_deep_sleep_start();
 }
 
 void app_main(void)
@@ -170,5 +208,10 @@ void app_main(void)
     // deep_sleep_timer();
 
     // On button press (default high), go to sleep
-    deep_sleep_ext0();
+    //deep_sleep_ext0();
+
+    //deep_sleep_ext1();
+
+    // Hiberation (most power optimized)
+    hibernation();
 }
