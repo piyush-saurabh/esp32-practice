@@ -1,0 +1,2 @@
+This is the sample .txt file inside a directory included into ESP32 flash as SPIFFS
+This is second line

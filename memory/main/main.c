@@ -51,6 +51,63 @@ void get_dram_iram()
     ESP_LOGI(TAG, "Available stack space in main task = %d bytes", stackmem);
 }
 
+// FreeRTOS task to report free stack memory of all the running tasks
+void get_free_memory(void *param)
+{
+  /*
+  TaskStatus_t *task_array;
+  volatile UBaseType_t num_tasks, x;
+  uint32_t total_runtime, ulStatsAsPercentage;
+
+  // Take a snapshot of the number of tasks in case it changes while this function is executing.
+ uxArraySize = uxTaskGetNumberOfTasks();
+
+ // Allocate a TaskStatus_t structure for each task.  An array could be
+ // allocated statically at compile time.
+ pxTaskStatusArray = pvPortMalloc( uxArraySize * sizeof( TaskStatus_t ) );
+
+ if( pxTaskStatusArray != NULL )
+ {
+      // Generate raw status information about each task.
+     //uxArraySize = uxTaskGetSystemState( pxTaskStatusArray, uxArraySize, &ulTotalRunTime );
+     UBaseType_t numTaskPopulated = uxTaskGetSystemState(task_array, num_tasks, &total_runtime);
+
+     // For percentage calculations.
+     total_runtime /= 100UL;
+
+     // Avoid divide by zero errors.
+     if( total_runtime > 0 )
+     {
+       char *memory_stats = (char *)pvPortMalloc(30 * num_tasks + 53);
+       if(memory_stats)
+       {
+         memset(memory_stats, (int)' ', (30 * num_tasks) + 53);
+         char *current_spot = memory_stats;
+         memcpy(memory_stats, "\nName\t\t\t\tStack\t\tCPU\t\tCore\n=======================================\n", 53);
+
+         current_spot +=53;
+         for(int i=0; i<numTaskPopulated; i++)
+         {
+           int task_runtime_percentage = task_array[i].ulRunTimeCounter / total_runtime;
+           memcpy(current_spot, task_array[i].pcTaskName, strlen(task_array[i].pcTaskName));
+           current_spot += 12;
+           
+         }
+
+       }
+     }
+
+*/
+ }
+
+
+  // Get the free memory of all the running task
+  uxTaskGetSystemState();
+
+  // report memory every 5 sec
+  vTaskDelay(5000 / portTICK_PERIOD_MS);
+}
+
 
 void app_main()
 {
@@ -70,4 +127,5 @@ void app_main()
   // task function, task name, stack depth, parameter to stack, task priority, task handle
   xTaskCreate(&sampleTask, "Sample Task", 8000, NULL, 1, NULL); // out of 8000 bytes, 400 bytes will be used by FreeRTOS
   
+  xTaskCreate(&get_free_memory, "Memory", 4096, NULL, 1, NULL);
 }
