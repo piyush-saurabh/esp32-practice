@@ -275,22 +275,29 @@ void timer_callback(void *args)
 // Task to monitor the resource every 5 sec
 void resource_monitor(void *params)
 {
-    const size_t bytes_per_task = 40;
-    char *task_list_buffer;
+    while (true)
+    {
+        const size_t bytes_per_task = 200;
+        char *task_list_buffer;
 
-    task_list_buffer = malloc(uxTaskGetNumberOfTasks() * bytes_per_task);
-    if (task_list_buffer == NULL)
-    {
-        ESP_LOGE("RESOURCE_MONITOR", "Failed to allocate buffer for vTaskList output");
-    }
-    else
-    {
-        fputs("Task Name\tStatus\tPrio\tStack\tTask#", stdout);
-        fputs("\n", stdout);
-        vTaskList(task_list_buffer);
-        fputs(task_list_buffer, stdout);
-        //vPortFree(task_list_buffer);
-        free(task_list_buffer);
+        //task_list_buffer = malloc(uxTaskGetNumberOfTasks() * bytes_per_task);
+        task_list_buffer = pvPortMalloc(uxTaskGetNumberOfTasks() * bytes_per_task);
+        if (task_list_buffer == NULL)
+        {
+            ESP_LOGE("RESOURCE_MONITOR", "Failed to allocate buffer for vTaskList output");
+        }
+        else
+        {
+            fputs("Task Name\tStatus\tPrio\tStack\tTask#", stdout);
+            fputs("\n", stdout);
+            vTaskList(task_list_buffer);
+            fputs(task_list_buffer, stdout);
+            vPortFree(task_list_buffer);
+            //free(task_list_buffer);
+        }
+
+        // Delay for 5 sec
+        vTaskDelay(5000 / portTICK_RATE_MS);
     }
 }
 
@@ -298,13 +305,14 @@ void app_main(void)
 {
 
     // Start the resource monitor
-    xTaskCreate(&resource_monitor, "Resource", 102400, NULL, 3, NULL);
+    xTaskCreate(&resource_monitor, "rs_monitor", 8192, NULL, 3, NULL);
 
     // Task Notification
     // Requires a handler, for e.g on receiver which sender can utilize
     xTaskCreate(&receiver, "receiver", 2048, NULL, 2, &receiverHandler);
     xTaskCreate(&sender, "sender", 2048, NULL, 2, NULL);
 
+    
     // Mutex Demo
     // Create mutex
     mutexBus = xSemaphoreCreateMutex();
@@ -317,6 +325,7 @@ void app_main(void)
     xTaskCreate(&listenForHTTP, "listen http", 2048, NULL, 2, NULL);
     xTaskCreate(&processHTTPRequest, "process http", 2048, NULL, 2, NULL);
 
+
     // Queue Demo
     // Create a queue
     // param1: total lenght of queue
@@ -325,6 +334,7 @@ void app_main(void)
     xTaskCreate(&listenForHTTPQueue, "listen http queue", 2048, NULL, 2, NULL);
     xTaskCreate(&processHTTPRequestQueue, "process http queue", 2048, NULL, 2, NULL);
 
+
     // Event Group Demo
     // Create event group
     evtGrp = xEventGroupCreate();
@@ -332,10 +342,12 @@ void app_main(void)
     xTaskCreate(&listenForBluetoothEventGroup, "listen bluetooth event group", 2048, NULL, 1, NULL);
     xTaskCreate(&init_task, "init task", 2048, NULL, 1, NULL);
 
+
     // Timer demo
     // Get the time in ms since the chip is up
     printf("App started %lld\n", esp_timer_get_time() / 1000);
 
+    
     // Create the timer
     // param 2: amount of time/ticks before the timer kicks in
     // param 3: repeat or reload. Fire once or fire again and again. here after every 2 sec, the timer handler will executed
@@ -365,6 +377,8 @@ void app_main(void)
     // Fire the timer once after 20 micro seconds
     //esp_timer_start_once(esp_timer_handle, 20);
 
+
+    
     // Fire the timer periodically after every 50 microsecond
     esp_timer_start_periodic(esp_timer_handle, 50);
 
@@ -388,7 +402,4 @@ void app_main(void)
         }
     }
 
-    
-
-    
 }
