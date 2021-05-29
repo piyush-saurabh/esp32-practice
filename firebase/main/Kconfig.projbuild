@@ -1,0 +1,31 @@
+menu "Firebase Configuration"
+
+config FIREBASE_API_KEY
+    string "Firebase API Key"
+    default ""
+
+config FIREBASE_AUTH_URL
+    string "Firebase Authentication URL"
+    default "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
+
+config FIREBASE_EMAIL
+    string "Chip2Cloud Email ID"
+    default ""
+
+config FIREBASE_PASSWORD
+    string "Chip2Cloud Password"
+    default ""  
+
+endmenu
+
+menu "WiFi Configuration"
+
+config WIFI_SSID
+    string "Wifi SSID"
+    default ""
+
+config WIFI_PASSWORD
+    string "Wifi Password"
+    default ""  
+
+endmenu
