@@ -280,7 +280,6 @@ void resource_monitor(void *params)
         const size_t bytes_per_task = 200;
         char *task_list_buffer;
 
-        //task_list_buffer = malloc(uxTaskGetNumberOfTasks() * bytes_per_task);
         task_list_buffer = pvPortMalloc(uxTaskGetNumberOfTasks() * bytes_per_task);
         if (task_list_buffer == NULL)
         {
@@ -288,12 +287,11 @@ void resource_monitor(void *params)
         }
         else
         {
-            fputs("Task Name\tStatus\tPrio\tStack\tTask#", stdout);
+            fputs("Task Name\tStatus\tPriority\tStack\tTask#", stdout);
             fputs("\n", stdout);
             vTaskList(task_list_buffer);
             fputs(task_list_buffer, stdout);
             vPortFree(task_list_buffer);
-            //free(task_list_buffer);
         }
 
         // Delay for 5 sec
