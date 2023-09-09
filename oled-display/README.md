@@ -14,9 +14,9 @@ OLED|Description|ESP32
 ----|-----------|-----
 D0|Serial Clock / SCK | GPIO 22
 D1|Serial Data / MOSI | GPIO 23
-RES|Reset | GPIO 15
-CD|Data/Command | GPIO 4
+CD|Data/Command / MISO| GPIO 19
 CS|Chip Select | GPIO 5
+RES|Reset | GPIO 15
 VCC|3.3 V | 3V3
 GND|Ground|GND
 
