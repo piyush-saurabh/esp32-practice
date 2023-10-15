@@ -4,14 +4,11 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/roguesecurity/esp/esp-idf/components/**",
-                "/home/roguesecurity/esp/esp-idf/examples/**",
-                "${workspaceFolder}/components/**",
-                "/home/roguesecurity/esp/esp-idf/components/esp_http_client/include"
+                "${env:IDF_PATH}/components/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
-            "cStandard": "gnu17",
+            "cStandard": "c11",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "linux-gcc-x64"
         }
