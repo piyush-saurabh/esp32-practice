@@ -11,15 +11,13 @@
 
 #define TAG "TEMPERATURE_SENSOR"
 
-//#define SENSOR_PIN 15
-
 void temperature_sensor(void *param)
 {
     int16_t humidity;
     int16_t temperature;
     gpio_num_t sensorPin = 33;
 
-    char *log_file_name = "/store/log-3.csv";
+    char *log_file_name = "/store/log-4.csv";
     //log_to_sdcard(log_file_name, "Time,Temperature,Humidity\n");
 
     log_to_sdcard(log_file_name, "Time,Temperature,Humidity\n");
@@ -58,6 +56,6 @@ void temperature_sensor(void *param)
         }
 
         // wait for 10 mins
-        vTaskDelay(60000 * 10 / portTICK_PERIOD_MS);
+        vTaskDelay(600000 / portTICK_PERIOD_MS);
     }
 }
