@@ -13,7 +13,7 @@
 #define TAG "INTERRUPT_TASK"
 
 #define DEBOUNCE_TIME 50 // Debounce time in ms
-#define PUSH_BUTTON_PIN 22
+#define PUSH_BUTTON_PIN 2
 
 
 

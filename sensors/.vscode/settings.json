@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "*.h": "c"
+        "*.h": "c",
+        "*.ipp": "c"
     },
     // The port and buad rate for flashing and monitoring your device
     // This is the same port which is passed using "runArgs" in devcontainer.json

@@ -11,18 +11,20 @@
     "dockerFile": "../Dockerfile",
 
     // Set *default* container specific settings.json values on container create.
-    "settings": {},
-
-    // Add the IDs of extensions you want installed when the devcontainer is created.
-    "extensions": [
-		"ms-vscode.cpptools",
-		"twxs.cmake",
-		"webfreak.debug"
-	],
+    "customizations": {
+        "vscode": {
+            "settings": {},
+            "extensions": [
+                "ms-vscode.cpptools",
+                "twxs.cmake",
+                "webfreak.debug"
+            ]
+        }
+    },
 
     // Passing the serial inside devcontainer
     "runArgs": [
-        "--device=/dev/ttyUSB0",
+        "--device=/dev/ttyUSB0"
     ],
 
     // This is the user with which devcontainer will be running
